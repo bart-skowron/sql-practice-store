@@ -3,6 +3,8 @@ SQL exercises of the most useful concepts and varying level of difficulty.
 The exercises cover the following topics:
 
 <br>**1. Data Query Language (DQL)**
+- filtering (logical operators);
+- basic functions (e.g. concat, coalesce);
 - aggregation;
 - strings;
 - views;
