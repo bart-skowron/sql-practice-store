@@ -76,7 +76,7 @@
 -- group by customerid;
 
 -- 2. JOINS
--- What was the city name of a person who ordered the biggest amount of items in one order and what was the value of the order?
+-- Q: What was the city name of a person who ordered the biggest amount of items in one order and what was the value of the order?
 -- select ol.orderlineid AS "No of items", o.customerid, c.firstname, c.lastname, c.city, ta.sumtotalamount from orderlines AS ol
 -- join orders as o using(orderid)
 -- join customers as c using(customerid)
@@ -84,12 +84,12 @@
 -- where orderlineid = (select max(orderlineid) from orderlines)
 -- order by ta.sumtotalamount DESC
 
--- Are there any customers who haven't placed an order? Who are they?
+-- Q: Are there any customers who haven't placed an order? Who are they?
 -- select * from customers
 -- LEFT OUTER JOIN orders using(customerid)
 -- where orderid is null
 
--- Write 0 next to these customers name
+-- Q: Write 0 next to these customers name
 -- select customers.lastname, COALESCE(orders.orderid, 0) from customers
 -- LEFT OUTER JOIN orders using(customerid)
 -- where orderid is null
@@ -119,7 +119,7 @@
 -- Q: When was the first order placed and how long ago it was? How many days ago it was?
 -- select min(orderdate), extract(epoch from age(min(orderdate)))/(3600*24) as age_oldest from orders
 
---Q: What was time difference between the first and the last order?
+-- Q: What was time difference between the first and the last order?
 -- select age(max(orderdate), min(orderdate)) as diff from orders
 
 -- Q: Select all orders from March 2004
@@ -138,12 +138,12 @@
 -- date_trunc('quarter', orderdate)
 -- )
 
---Q: Show all orders which were less than 30 days older from the newest order
+-- Q: Show all orders which were less than 30 days older from the newest order
 -- select orderid, orderdate from orders
 -- where orderdate > (select max(orderdate) from orders) - interval '30 days'
 -- order by orderdate desc
 
---Q: Show the last order of each customer. 
+-- Q: Show the last order of each customer. 
 -- select customerid, orderid, totalamount, orderdate from orders as o
 -- JOIN (select customerid, max(orderdate) as max from orders group by customerid) as lo using(customerid)
 -- where lo.max = o.orderdate
@@ -152,33 +152,33 @@
 -- 4. Advanced SQL
 -- Windows
 
--- Show how much each product price deviates from the average price of a product in its category
+-- Q: Show how much each product price deviates from the average price of a product in its category
 -- select category, prod_id, price, (AVG(price) OVER (partition by category) - price) as price_cat_avg_diff
 -- from products
 
--- Show how much each product contributed to the whole value of an order
+-- Q: Show how much each product contributed to the whole value of an order
 -- select orderid, prod_id, quantity*price as value, round((quantity*price/ sum(quantity*price) over(partition by orderid)),2) as share_in_order
 -- from orderlines join products using(prod_id)
 
--- Show how much each product (quantity * price) contributed to the whole value  of an order
+-- Q: Show how much each product (quantity * price) contributed to the whole value  of an order
 -- select orderid, prod_id, quantity*price as value, round((quantity*price/ sum(quantity*price) over(partition by orderid)),2) as share_in_order
 -- from orderlines join products using(prod_id)
 
--- Rank products within each order by their contribution to the whole value of an order
+-- Q: Rank products within each order by their contribution to the whole value of an order
 -- select orderid, prod_id, quantity*price as value, rank() over(partition by orderid order by quantity*price DESC) as rank_in_order
 -- from orderlines join products using(prod_id)
 
--- Show percentage change for each customer for order (total value) for the consecutive orders
+-- Q: Show percentage change for each customer for order (total value) for the consecutive orders
 -- select customerid, orderid, orderdate, totalamount, (-LAG(totalamount,1) OVER(partition by customerid order by orderdate) + totalamount)*100/totalamount AS pct_change
 -- from orders
 -- order by customerid, orderdate ASC
 
--- For each customer-order show the average of the last 3 orders.
+-- Q: For each customer-order show the average of the last 3 orders.
 -- select customerid, orderid, orderdate, totalamount, avg(totalamount) over(partition by customerid order by orderdate rows between 2 preceding and current row)
 -- from orders
 -- order by customerid, orderdate
 
--- Show how much each order (for each customer) contributes to the quarterly value of orders by a customer
+-- Q: Show how much each order (for each customer) contributes to the quarterly value of orders by a customer
 -- select customerid, orderid, orderdate, totalamount/ (sum(totalamount) over(partition by customerid, date_trunc('quarter', orderdate))) as quarterly_share
 -- from orders
 -- order by customerid, orderdate
@@ -227,27 +227,27 @@
 -- description VARCHAR(1000)
 -- );
 -- 
---Q: Add a column that will contain info about how much water there is in the product
+-- Q: Add a column that will contain info about how much water there is in the product
 -- alter table composition
 -- add water_share float not null check (water_share >= 0 AND water_share <= 100);
 -- select * from composition;
 -- 
---Q: In the hindsight, we can say that water_share column is not necessary. Let's drop it.
+-- Q: In the hindsight, we can say that water_share column is not necessary. Let's drop it.
 -- alter table composition
 -- drop water_share;
 -- 
---Q: Insert 3 rows of data into the table
+-- Q: Insert 3 rows of data into the table
 -- insert into composition (prod_id, quality, coal_share, description) values
 -- (1, 'good', 1.23, 'Some funny product description'),
 -- (2, 'bad', 7.7777777, 'What is a description?'),
 -- (8, 'ok', 2.22, 'Desc lala ');
 -- 
---Q: Add 2 rows of data but add only these columns which are necessary
+-- Q: Add 2 rows of data but add only these columns which are necessary
 -- insert into composition (prod_id, coal_share) values
 -- (3, 8.233),
 -- (4,55.5);
 -- 
---Q: Add descriptions to rows where it's missing.
+-- Q: Add descriptions to rows where it's missing.
 -- update composition
 -- set description='We wait for a good description'
 -- where description IS NULL;
